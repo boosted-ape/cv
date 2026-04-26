@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>boosted-ape | Terminal Portfolio</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #1e1e2e;
+      --bg-secondary: #181825;
+      --bg-tertiary: #313244;
+      --terminal-bg: #11111b;
+      --text-primary: #cdd6f4;
+      --text-secondary: #a6adc8;
+      --text-dim: #6c7086;
+      --text-muted: #45475a;
+      --accent: #a6e3a1;
+      --accent-dim: #89b4fa;
+      --prompt: #f38ba8;
+      --string: #fab387;
+      --keyword: #cba6f7;
+      --comment: #6c7086;
+    }
+
+    body {
+      font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+      font-size: 14px;
+    }
+
+    .scanlines {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.15),
+        rgba(0, 0, 0, 0.15) 1px,
+        transparent 1px,
+        transparent 2px
+      );
+      z-index: 1000;
+      opacity: 0.3;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+
+    header {
+      margin-bottom: 48px;
+    }
+
+    .terminal-window {
+      background: var(--terminal-bg);
+      border: 1px solid #45475a;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 32px;
+    }
+
+    .terminal-header {
+      background: #181825;
+      padding: 12px 16px;
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid #45475a;
+    }
+
+    .terminal-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .terminal-dot.red { background: #f38ba8; }
+    .terminal-dot.yellow { background: #f9e2af; }
+    .terminal-dot.green { background: #a6e3a1; }
+
+    .terminal-title {
+      color: var(--text-dim);
+      font-size: 12px;
+      margin-left: 12px;
+      display: flex;
+      align-items: center;
+    }
+
+    .terminal-body {
+      padding: 24px;
+    }
+
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .prompt {
+      color: var(--prompt);
+      font-weight: 600;
+    }
+
+    .profile-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 8px;
+      border: 2px solid var(--text-dim);
+      margin-bottom: 16px;
+    }
+
+    .profile-name {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .profile-name::before {
+      content: '> ';
+      color: var(--prompt);
+    }
+
+    .profile-username {
+      color: var(--text-dim);
+      margin-bottom: 16px;
+    }
+
+    .profile-bio {
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+      max-width: 600px;
+    }
+
+    .stats {
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-label {
+      color: var(--text-dim);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .stat-value {
+      color: var(--string);
+      font-size: 1.4rem;
+      font-weight: 600;
+    }
+
+    .links {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 13px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      border: 1px solid;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--bg-primary);
+      border-color: var(--accent);
+    }
+
+    .btn-primary:hover {
+      background: var(--text-secondary);
+      border-color: var(--text-secondary);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-primary);
+      border-color: var(--text-dim);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--text-primary);
+      background: var(--bg-tertiary);
+    }
+
+    .section-title {
+      font-size: 1.2rem;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title::before {
+      content: '##';
+      color: var(--prompt);
+    }
+
+    .section-subtitle {
+      color: var(--text-dim);
+      margin-bottom: 24px;
+      font-size: 12px;
+    }
+
+    .projects-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .project-card {
+      background: var(--bg-secondary);
+      border: 1px solid #45475a;
+      border-radius: 8px;
+      padding: 20px;
+      transition: all 0.25s ease;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .project-card:hover {
+      border-color: var(--text-dim);
+      background: var(--bg-tertiary);
+      transform: translateX(4px);
+    }
+
+    .project-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+      gap: 16px;
+    }
+
+    .project-name {
+      color: var(--string);
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .project-stats {
+      display: flex;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--text-dim);
+      flex-shrink: 0;
+    }
+
+    .project-description {
+      color: var(--text-secondary);
+      font-size: 13px;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+
+    .project-meta {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .language-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 10px;
+      height: 18px;
+      background: var(--accent);
+      animation: blink 1s step-end infinite;
+      vertical-align: middle;
+      margin-left: 4px;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    .loading {
+      color: var(--text-dim);
+      padding: 20px;
+    }
+
+    .loading::after {
+      content: '...';
+      animation: loading 1.5s infinite;
+    }
+
+    @keyframes loading {
+      0% { content: '.'; }
+      33% { content: '..'; }
+      66% { content: '...'; }
+    }
+
+    .manual-project {
+      background: var(--bg-secondary);
+      border: 1px solid #45475a;
+      border-radius: 8px;
+      padding: 20px;
+      transition: all 0.25s ease;
+      border-left: 3px solid var(--keyword);
+    }
+
+    .manual-project:hover {
+      border-color: var(--text-dim);
+      background: var(--bg-tertiary);
+      transform: translateX(4px);
+    }
+
+    .manual-project .project-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+      gap: 16px;
+    }
+
+    .manual-project .project-name {
+      color: var(--string);
+    }
+
+    .manual-project .project-description {
+      color: var(--text-secondary);
+    }
+
+    .manual-project .project-meta {
+      color: var(--text-muted);
+    }
+
+    .fork-badge {
+      background: var(--keyword);
+      color: var(--bg-primary);
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 8px;
+      font-weight: 600;
+    }
+
+    footer {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid #45475a;
+      color: var(--text-dim);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    @media (max-width: 640px) {
+      .profile-header {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .profile-name {
+        font-size: 1.4rem;
+      }
+
+      .stats {
+        justify-content: center;
+      }
+
+      .links {
+        justify-content: center;
+      }
+
+      .project-header {
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .project-stats {
+        align-self: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="scanlines"></div>
+  
+  <div class="container">
+    <header>
+      <div class="terminal-window">
+        <div class="terminal-header">
+          <div class="terminal-dot red"></div>
+          <div class="terminal-dot yellow"></div>
+          <div class="terminal-dot green"></div>
+          <div class="terminal-title">user@portfolio:~/</div>
+        </div>
+        <div class="terminal-body">
+          <div class="profile-header">
+            <span class="prompt">$</span>
+            <span>whoami</span>
+          </div>
+          <img class="profile-avatar" id="avatar" alt="Profile avatar">
+          <div class="profile-name" id="name">Loading<span class="cursor"></span></div>
+          <div class="profile-username" id="username">@boosted-ape</div>
+          <p class="profile-bio" id="bio">Aspiring Software Engineer</p>
+          <div class="stats">
+            <div class="stat">
+              <span class="stat-label">Repositories</span>
+              <span class="stat-value" id="repos">0</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">Followers</span>
+              <span class="stat-value" id="followers">0</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">Total Stars</span>
+              <span class="stat-value" id="stars">0</span>
+            </div>
+          </div>
+          <div class="links">
+            <a href="https://github.com/boosted-ape" target="_blank" rel="noopener" class="btn btn-primary">
+              <span class="prompt">$</span> gh profile
+            </a>
+            <a href="mailto:wbjhee@gmail.com" class="btn btn-secondary">
+              <span class="prompt">$</span> mailto
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <div class="section-title">Projects</div>
+      <p class="section-subtitle">cd ./projects && ls -la</p>
+      
+      <div class="projects-grid" id="projects-grid">
+        <div class="loading">Loading repositories</div>
+      </div>
+    </main>
+
+    <footer>
+      <span class="prompt">$</span> echo "Thanks for visiting!"<br><br>
+      <span style="color: var(--text-muted);">Last updated: <span id="last-updated"></span></span>
+    </footer>
+  </div>
+
+  <script>
+    const PROJECT_DESCRIPTIONS = {
+      'agentic-portfolio': 'An AI-powered portfolio website with terminal aesthetics and GitHub integration.',
+      'autotune': 'ML-driven hyperparameter optimization toolkit for deep learning models.',
+      'distributed-cache': 'High-performance distributed caching system with Redis compatibility.',
+      'rust-search': 'Full-text search engine built in Rust with WebAssembly support.',
+      'api-gateway': 'Cloud-native API gateway with rate limiting and authentication.',
+      'data-pipeline': 'Real-time data processing pipeline using Apache Kafka and Spark.',
+      'ml-utils': 'Collection of machine learning utilities and helper functions.',
+      'dockerfiles': 'Optimized Docker images for various development environments.',
+    };
+
+    const MANUAL_PROJECTS = [
+      {
+        name: 'MariaDB (ColumnStore Fork)',
+        description: 'Implemented recursive CTE (Common Table Expressions) feature for the ColumnStore OLAP plugin, enabling complex hierarchical queries and analytical operations on distributed data.',
+        language: 'C++',
+        url: 'https://github.com/boosted-ape/mariadb-columnstore-engine',
+        fork: true
+      }
+    ];
+
+    const LANGUAGE_COLORS = {
+      JavaScript: '#f1e05a',
+      TypeScript: '#2b7489',
+      Python: '#3572A5',
+      Java: '#b07219',
+      'C++': '#f34b7d',
+      C: '#555555',
+      'C#': '#178600',
+      Go: '#00ADD8',
+      Rust: '#dea584',
+      Ruby: '#701516',
+      PHP: '#4F5D95',
+      Swift: '#F05138',
+      Kotlin: '#A97BFF',
+      HTML: '#e34c26',
+      CSS: '#563d7c',
+      Shell: '#89e051',
+      Lua: '#000080',
+      Dart: '#00B4AB',
+      Scala: '#c22d40',
+      R: '#198CE7',
+    };
+
+    async function fetchJSON(url) {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response.json();
+    }
+
+    async function loadProfile() {
+      try {
+        const user = await fetchJSON('https://api.github.com/users/boosted-ape');
+        
+        document.getElementById('avatar').src = user.avatar_url;
+        document.getElementById('name').innerHTML = 'Wong Boon Jhee' + '<span class="cursor"></span>';
+        document.getElementById('username').textContent = '@' + user.login;
+        document.getElementById('bio').textContent = user.bio || 'Aspiring Software Engineer';
+        document.getElementById('repos').textContent = user.public_repos;
+        document.getElementById('followers').textContent = user.followers;
+        
+        const lastUpdated = new Date().toLocaleDateString('en-US', { 
+          year: 'numeric', 
+          month: 'short', 
+          day: 'numeric' 
+        });
+        document.getElementById('last-updated').textContent = lastUpdated;
+      } catch (e) {
+        console.error('Failed to load profile:', e);
+        document.getElementById('name').innerHTML = 'Error<span class="cursor"></span>';
+      }
+    }
+
+    function getProjectDescription(repoName, defaultDescription) {
+      if (PROJECT_DESCRIPTIONS[repoName]) {
+        return PROJECT_DESCRIPTIONS[repoName];
+      }
+      return defaultDescription || 'No description available';
+    }
+
+    async function loadRepos() {
+      const grid = document.getElementById('projects-grid');
+      let totalStars = 0;
+      
+      try {
+        const repos = await fetchJSON('https://api.github.com/users/boosted-ape/repos?sort=updated&per_page=100');
+        
+        const nonForks = repos.filter(r => !r.fork).slice(0, 12);
+        totalStars = repos.reduce((acc, r) => acc + r.stargazers_count, 0);
+        document.getElementById('stars').textContent = totalStars;
+        
+        let html = '';
+        
+        html += MANUAL_PROJECTS.map(project => {
+          const langColor = LANGUAGE_COLORS[project.language] || '#6e7681';
+          return `
+            <a href="${project.url}" target="_blank" rel="noopener" class="manual-project">
+              <div class="project-header">
+                <div class="project-name">
+                  ${project.name}
+                  ${project.fork ? '<span class="fork-badge">FORK</span>' : ''}
+                </div>
+                <div class="project-stats">
+                  <span>⭐ --</span>
+                  <span>🍴 --</span>
+                </div>
+              </div>
+              <p class="project-description">${project.description}</p>
+              <div class="project-meta">
+                <span>
+                  <span class="language-dot" style="background: ${langColor}"></span>
+                  ${project.language}
+                </span>
+              </div>
+            </a>
+          `;
+        }).join('');
+
+        if (nonForks.length === 0 && MANUAL_PROJECTS.length > 0) {
+          grid.innerHTML = html;
+          return;
+        }
+
+        html += nonForks.map(repo => {
+          const langColor = LANGUAGE_COLORS[repo.language] || '#6e7681';
+          const lang = repo.language || 'Unknown';
+          const description = getProjectDescription(repo.name, repo.description);
+          
+          return `
+            <a href="${repo.html_url}" target="_blank" rel="noopener" class="project-card">
+              <div class="project-header">
+                <div class="project-name">${repo.name}</div>
+                <div class="project-stats">
+                  ${repo.stargazers_count > 0 ? `<span>⭐ ${repo.stargazers_count}</span>` : ''}
+                  ${repo.forks_count > 0 ? `<span>🍴 ${repo.forks_count}</span>` : ''}
+                </div>
+              </div>
+              <p class="project-description">${description}</p>
+              <div class="project-meta">
+                <span>
+                  <span class="language-dot" style="background: ${langColor}"></span>
+                  ${lang}
+                </span>
+              </div>
+            </a>
+          `;
+        }).join('');
+
+        if (nonForks.length === 0 && MANUAL_PROJECTS.length === 0) {
+          grid.innerHTML = '<div class="loading">No public repositories found</div>';
+          return;
+        }
+
+        grid.innerHTML = html;
+      } catch (e) {
+        grid.innerHTML = `<div class="loading">Failed to load repositories</div>`;
+      }
+    }
+
+    loadProfile();
+    loadRepos();
+  </script>
+</body>
+</html>
