@@ -14,25 +14,34 @@
     }
 
     :root {
-      --bg-primary: #1e1e2e;
-      --bg-secondary: #181825;
-      --bg-tertiary: #313244;
-      --terminal-bg: #11111b;
-      --text-primary: #cdd6f4;
-      --text-secondary: #a6adc8;
-      --text-dim: #6c7086;
-      --text-muted: #45475a;
-      --accent: #a6e3a1;
-      --accent-dim: #89b4fa;
-      --prompt: #f38ba8;
-      --string: #fab387;
-      --keyword: #cba6f7;
-      --comment: #6c7086;
+      --bg-primary: #282828;
+      --bg-secondary: #1d2021;
+      --bg-tertiary: #32302f;
+      --terminal-bg: #1d2021;
+      --text-primary: #ebdbb2;
+      --text-secondary: #d5c4a1;
+      --text-dim: #665c54;
+      --text-muted: #7c6f64;
+      --accent: #b8bb26;
+      --accent-dim: #83a598;
+      --prompt: #d3869b;
+      --string: #b8bb26;
+      --keyword: #d3869b;
+      --comment: #7c6f64;
+
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5);
+      --shadow-glow: 0 0 20px rgba(184, 187, 38, 0.15);
     }
 
     body {
       font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
-      background: var(--bg-primary);
+      background: 
+        radial-gradient(ellipse at 20% 20%, rgba(184, 187, 38, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(211, 134, 155, 0.06) 0%, transparent 50%),
+        linear-gradient(180deg, var(--bg-primary) 0%, #252525 100%);
+      background-attachment: fixed;
       color: var(--text-primary);
       line-height: 1.6;
       min-height: 100vh;
@@ -48,13 +57,13 @@
       pointer-events: none;
       background: repeating-linear-gradient(
         0deg,
-        rgba(0, 0, 0, 0.15),
-        rgba(0, 0, 0, 0.15) 1px,
+        rgba(0, 0, 0, 0.03),
+        rgba(0, 0, 0, 0.03) 1px,
         transparent 1px,
         transparent 2px
       );
       z-index: 1000;
-      opacity: 0.3;
+      opacity: 0.5;
     }
 
     .container {
@@ -69,18 +78,20 @@
 
     .terminal-window {
       background: var(--terminal-bg);
-      border: 1px solid #45475a;
+      border: 1px solid var(--text-dim);
       border-radius: 8px;
       overflow: hidden;
       margin-bottom: 32px;
+      box-shadow: var(--shadow-lg);
     }
 
     .terminal-header {
-      background: #181825;
+      background: linear-gradient(180deg, #3c3836 0%, #32302f 100%);
       padding: 12px 16px;
       display: flex;
       gap: 8px;
-      border-bottom: 1px solid #45475a;
+      border-bottom: 1px solid var(--text-dim);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
 
     .terminal-dot {
@@ -89,9 +100,9 @@
       border-radius: 50%;
     }
 
-    .terminal-dot.red { background: #f38ba8; }
-    .terminal-dot.yellow { background: #f9e2af; }
-    .terminal-dot.green { background: #a6e3a1; }
+    .terminal-dot.red { background: #cc241d; }
+    .terminal-dot.yellow { background: #d79921; }
+    .terminal-dot.green { background: #98971f; }
 
     .terminal-title {
       color: var(--text-dim);
@@ -121,8 +132,9 @@
       width: 80px;
       height: 80px;
       border-radius: 8px;
-      border: 2px solid var(--text-dim);
+      border: 2px solid var(--accent);
       margin-bottom: 16px;
+      box-shadow: var(--shadow-glow);
     }
 
     .profile-name {
@@ -195,24 +207,30 @@
 
     .btn-primary {
       background: var(--accent);
-      color: var(--bg-primary);
+      color: var(--bg-secondary);
       border-color: var(--accent);
+      box-shadow: var(--shadow-sm);
     }
 
     .btn-primary:hover {
       background: var(--text-secondary);
       border-color: var(--text-secondary);
+      box-shadow: var(--shadow-md), var(--shadow-glow);
+      transform: translateY(-1px);
     }
 
     .btn-secondary {
-      background: transparent;
+      background: var(--bg-tertiary);
       color: var(--text-primary);
       border-color: var(--text-dim);
+      box-shadow: var(--shadow-sm);
     }
 
     .btn-secondary:hover {
-      border-color: var(--text-primary);
+      border-color: var(--accent);
       background: var(--bg-tertiary);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-1px);
     }
 
     .section-title {
@@ -243,18 +261,20 @@
 
     .project-card {
       background: var(--bg-secondary);
-      border: 1px solid #45475a;
+      border: 1px solid var(--text-dim);
       border-radius: 8px;
       padding: 20px;
       transition: all 0.25s ease;
       text-decoration: none;
       color: inherit;
+      box-shadow: var(--shadow-sm);
     }
 
     .project-card:hover {
-      border-color: var(--text-dim);
+      border-color: var(--accent);
       background: var(--bg-tertiary);
       transform: translateX(4px);
+      box-shadow: var(--shadow-md), var(--shadow-glow);
     }
 
     .project-header {
@@ -334,17 +354,19 @@
 
     .manual-project {
       background: var(--bg-secondary);
-      border: 1px solid #45475a;
+      border: 1px solid var(--text-dim);
       border-radius: 8px;
       padding: 20px;
       transition: all 0.25s ease;
       border-left: 3px solid var(--keyword);
+      box-shadow: var(--shadow-sm);
     }
 
     .manual-project:hover {
-      border-color: var(--text-dim);
+      border-color: var(--accent);
       background: var(--bg-tertiary);
       transform: translateX(4px);
+      box-shadow: var(--shadow-md);
     }
 
     .manual-project .project-header {
@@ -380,7 +402,7 @@
     footer {
       margin-top: 48px;
       padding-top: 24px;
-      border-top: 1px solid #45475a;
+      border-top: 1px solid var(--text-dim);
       color: var(--text-dim);
       font-size: 12px;
       text-align: center;
@@ -451,7 +473,7 @@
             </div>
           </div>
           <div class="links">
-            <a href="https://github.com/boosted-ape" target="_blank" rel="noopener" class="btn btn-primary">
+            <a href="https://github.com/boosted-ape" target="_blank" rel="noopener" class="btn btn-secondary">
               <span class="prompt">$</span> gh profile
             </a>
             <a href="mailto:wbjhee@gmail.com" class="btn btn-secondary">
