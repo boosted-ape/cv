@@ -153,3 +153,31 @@
 /* GenericTraceback */ .dark .chroma .gt { color:#ff7b72 }
 /* GenericUnderline */ .dark .chroma .gl { text-decoration:underline }
 /* TextWhitespace */ .dark .chroma .w { color:#6e7681 }
+
+/*
+ * Readability overrides.
+ * paper's typography sets --tw-prose-pre-code to a near-white, which is
+ * correct for a dark block but leaks into the light code block: untokenized
+ * text (braces, punctuation, plain identifiers) inherits light-on-light.
+ * Pin a real base color and give the block edges that survive the paper bg.
+ */
+.highlight > div { background: transparent; }
+.highlight pre { color: #111827; }
+.chroma {
+  color: #111827;
+  background-color: #f3f4f6;
+  box-shadow: inset 0 0 0 1px rgb(17 24 39 / 10%);
+}
+.chroma .p,
+.chroma .o,
+.chroma .w { color: #111827; }
+
+.dark .highlight pre { color: #e6edf3; }
+.dark .highlight > div { background: transparent; }
+.dark .chroma {
+  color: #e6edf3;
+  background-color: #161b22;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 10%);
+}
+.dark .chroma .p,
+.dark .chroma .o { color: #e6edf3; }

@@ -13,9 +13,9 @@ pagination:
 
 params:
   color: linen
-  description: Notes on compilers, program analysis, and systems.
+  description: Systems programming rabbit holes, compilers, and projects I start at 1am.
   name: boosted-ape
-  bio: Notes on compilers, program analysis, and systems.
+  bio: Systems programming rabbit holes, compilers, and projects I start at 1am.
   github: boosted-ape
   mainSections:
     - posts
