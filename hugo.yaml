@@ -1,0 +1,37 @@
+baseURL: https://boosted-ape.github.io/cv/
+title: boosted-ape
+locale: en
+theme: hugo-paper
+
+# GitHub Pages serves this repo from the master branch root, so the generated
+# site is committed alongside its source. See README.md.
+publishDir: "."
+enableRobotsTXT: true
+
+pagination:
+  pagerSize: 10
+
+params:
+  color: linen
+  description: Notes on compilers, program analysis, and systems.
+  name: boosted-ape
+  bio: Notes on compilers, program analysis, and systems.
+  github: boosted-ape
+  mainSections:
+    - posts
+  disableHLJS: true
+
+markup:
+  goldmark:
+    renderer:
+      unsafe: true
+  highlight:
+    # noClasses: false -> Chroma emits CSS classes; colors live in assets/custom.css
+    noClasses: false
+    style: github
+    codeFences: true
+    lineNos: false
+    tabWidth: 4
+
+taxonomies:
+  tag: tags
