@@ -15,7 +15,7 @@ Borrow checking looks like a type system problem until you try to add it to C++.
 
 I could have spent the entire project writing special cases, and I still would not have been able to tell you what "accepted" meant.
 
-So I didn't write a borrow checker for C++. I wrote one for a small, opt-in dialect of C++ — and made the boundary part of the design.
+So I didn't write a borrow checker for C++. I wrote one for a small, opt-in dialect of C++ and made the boundary part of the design.
 
 The project is called `safe_cpp`. A translation unit opts in with:
 
@@ -25,9 +25,7 @@ The project is called `safe_cpp`. A translation unit opts in with:
 
 Every file in the program must carry the pragma. The checker treats the supplied files as one closed world: every called user function has a body in those files, every type and global fits the modeled subset, and there is exactly one zero-argument `int main()`. Anything outside the subset is rejected before it can be reported as a success.
 
-Sounds restrictive? It is.
-
-But it buys the thing a general C++ analyzer usually cannot give you — a precise definition of what the checker is claiming. A clean result means "this represented program follows my policy," not "all of C++ is safe."
+But it buys the thing a general C++ analyzer usually cannot give you: a precise definition of what the checker is claiming. A clean result means "this represented program follows my policy," not "all of C++ is safe."
 
 Everything else in the project followed from that one decision.
 
@@ -72,7 +70,7 @@ This MIR is not rustc's. It's smaller, and shaped around what this checker can a
 
 ## The rules, in plain English
 
-The checker follows an NLL-style model, but it's an ad-hoc point-set implementation, not a copy of rustc.
+The checker is inspired by rust's NLL model, but it's an ad-hoc point-set implementation, not a copy of rustc.
 
 Liveness seeds regions. For each local, the checker computes the MIR points where the local is live. A loan's region starts at its creation point and is constrained by uses, assignments, calls, reborrows, and returns. The solver propagates those constraints to a fixed point.
 
@@ -129,7 +127,7 @@ int& first(int& a, int& b) {
 
 The result of `first(x, y)` is a borrow of `x`, not a fresh loan unrelated to the arguments. The checker infers return origins from function bodies and propagates them through the call graph. If several reference parameters can reach the return, it keeps their union.
 
-If a returned reference is not rooted in a parameter, the checker rejects the function. That rules out returning a reference to a local — a dangling reference in the modeled subset.
+If a returned reference is not rooted in a parameter, the checker rejects the function. That rules out returning a reference to a local, a dangling reference in the modeled subset.
 
 This matters a lot for LLVM later. A returned reference is not the same as "a pointer that does not alias any argument." A function like `id(x)` returns `x` itself, so LLVM's return `noalias` would be a false claim. The correct lowering gives the return `nonnull` only, and lets the caller's borrow information handle exclusivity. That distinction saved me from emitting an unsound attribute.
 
@@ -301,6 +299,4 @@ But the main lesson wouldn't change.
 
 **Conservative is a valid answer.** The checker rejects more than it needs to. That's fine. The project's promise is not "accept all valid C++." It's "accept what it can prove, and say why it rejected the rest."
 
-The final result is a small, opinionated tool: a Clang front end, a custom MIR, a point-set borrow checker, and an LLVM backend that turns a borrow proof into `noalias` and `readonly`. It's not a replacement for a C++ compiler. It's a demonstration that the most valuable part of a borrow checker is not the syntax, or the diagnostics, or even the solver.
-
-It's the decision to define the world you're checking.
+The final result is a small, opinionated tool: a Clang front end, a custom MIR, a point-set borrow checker, and an LLVM backend that turns a borrow proof into `noalias` and `readonly` 
